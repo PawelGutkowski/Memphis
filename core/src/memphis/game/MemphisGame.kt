@@ -28,9 +28,9 @@ class MemphisGame() : ApplicationAdapter() {
     companion object {
         val GAME_ASSETS = GameAssets(mapOf(
                 "template" to listOf (
-                        AnimationAsset("walk", "template/walk.png", "template/walk.json", 333f, 476f, 0.02f, false),
-                        AnimationAsset("stand", "template/stand.png", "template/stand.png", 198f, 472f, 0.02f, true),
-                        AnimationAsset("hit", "template/hit.png", "template/hit.png", 294f, 473f, 0.02f, true)
+                        AnimationAsset("walk", "template/walk.png", "template/walk.json", 333f, 476f, 0.02f),
+                        AnimationAsset("stand", "template/stand.png", "template/stand.png", 198f, 472f, 0.02f),
+                        AnimationAsset("hit", "template/hit.png", "template/hit.png", 294f, 473f, 0.02f)
                 )
         ))
     }
@@ -70,5 +70,6 @@ class MemphisGame() : ApplicationAdapter() {
         viewport?.update(width, height)
     }
 }
-
+/*
 fun TextureRegion.isFirst() : Boolean = MathUtils.isEqual(this.u, 0f) && MathUtils.isEqual(this.v, 0f)
+*/

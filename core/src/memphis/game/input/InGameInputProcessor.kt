@@ -6,16 +6,16 @@ import memphis.game.core.Actor
 
 class InGameInputProcessor(val actor: Actor) : InputAdapter() {
 
-    val bindings: Map<Int, InGameAction> = mapOf(
-            Input.Keys.LEFT to InGameAction.GO_LEFT,
-            Input.Keys.RIGHT to InGameAction.GO_RIGHT,
-            Input.Keys.DOWN to InGameAction.GO_DOWN,
-            Input.Keys.UP to InGameAction.GO_UP,
-            Input.Keys.Z to InGameAction.BLOCK,
-            Input.Keys.X to InGameAction.HIT
+    val bindings: Map<Int, ActorAction> = mapOf(
+            Input.Keys.LEFT to ActorAction.GO_LEFT,
+            Input.Keys.RIGHT to ActorAction.GO_RIGHT,
+            Input.Keys.DOWN to ActorAction.GO_DOWN,
+            Input.Keys.UP to ActorAction.GO_UP,
+            Input.Keys.Z to ActorAction.BLOCK,
+            Input.Keys.X to ActorAction.HIT
     )
 
-    fun processAction(keycode: Int, handler: (InGameAction)-> Boolean) : Boolean {
+    fun processAction(keycode: Int, handler: (ActorAction)-> Boolean) : Boolean {
         val action = bindings[keycode]
         if (action != null) {
             handler.invoke(action)

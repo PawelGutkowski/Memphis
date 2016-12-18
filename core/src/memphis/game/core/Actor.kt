@@ -4,8 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
-import memphis.game.input.InGameAction
-import memphis.game.isFirst
+import memphis.game.input.ActorAction
 
 abstract class Actor(val animations : List<NamedAnimation>) {
 
@@ -15,9 +14,9 @@ abstract class Actor(val animations : List<NamedAnimation>) {
 
     open val size: Vector2 = Vector2.Zero
 
-    open val actions : MutableSet<InGameAction> = mutableSetOf()
+    open val actions : MutableSet<ActorAction> = mutableSetOf(ActorAction.STAND)
 
-    var currentAnimation : NamedAnimation? = null
+    var currentAnimation : NamedAnimation = getAnimation("stand")
 
     var currentFrame : TextureRegion? = null
 
@@ -27,47 +26,50 @@ abstract class Actor(val animations : List<NamedAnimation>) {
 
     fun render(batch: SpriteBatch){
         stateTime += Gdx.graphics.deltaTime
-        if(currentAnimation == null){
-            currentAnimation = animations.find { it.name == "stand" } ?: throw Exception("No animation for state stand")
-        }
-        if(currentAnimation?.breakable ?: false || currentFrame?.isFirst() ?: false){
-            if(actions.contains(InGameAction.GO_RIGHT) && actions.contains(InGameAction.GO_LEFT)){
-                actions.remove(InGameAction.GO_RIGHT)
-                actions.remove(InGameAction.GO_LEFT)
-            } else if(actions.contains(InGameAction.GO_LEFT)){
+
+        if(currentAnimation.isAnimationFinished(stateTime)){
+            if(actions.contains(ActorAction.GO_RIGHT) && actions.contains(ActorAction.GO_LEFT)){
+                actions.remove(ActorAction.GO_RIGHT)
+                actions.remove(ActorAction.GO_LEFT)
+            } else if(actions.contains(ActorAction.GO_LEFT)){
                 orientation = Orientation.LEFT
-                currentAnimation = animations.find { it.name == "walk" }
-            } else if(actions.contains(InGameAction.GO_RIGHT)){
-                currentAnimation = animations.find { it.name == "walk" }
+                currentAnimation = getAnimation("walk")
+            } else if(actions.contains(ActorAction.GO_RIGHT)){
+                currentAnimation = getAnimation("walk")
                 orientation = Orientation.RIGHT
             } else {
-                currentAnimation = animations.find { it.name == "stand"}
+                currentAnimation = getAnimation("stand")
             }
         }
-        if(currentAnimation?.name == "walk"){
+
+        if(currentAnimation.name == "walk"){
             position.add(orientation.scaleX * 7f, 0f)
         }
-        if(actions.contains(InGameAction.HIT)){
-            currentAnimation = animations.find {it.name == "hit"}
+        if(actions.contains(ActorAction.HIT)){
+            currentAnimation = getAnimation("hit")
         }
-        currentFrame = currentAnimation?.getKeyFrame(stateTime, true)
-        if(currentFrame != null) {
-            size.set (
-                    currentFrame?.regionWidth?.toFloat() ?: 0f,
-                    currentFrame?.regionHeight?.toFloat() ?: 0f
-            )
-            if(orientation == Orientation.LEFT){
-                currentFrame?.flip(true, false)
-            }
-            batch.draw (
-                    currentFrame,
-                    //position, bottom left corner
-                    position.x - (size.x/2),
-                    position.y
-            )
-            if(currentFrame?.isFlipX ?: false){
-                currentFrame?.flip(true, false)
-            }
-        }
+        currentFrame = renderFrame(batch, currentAnimation.getKeyFrame(stateTime, true))
     }
+
+    private fun renderFrame(batch: SpriteBatch, currentFrame : TextureRegion) : TextureRegion {
+        size.set(
+                currentFrame.regionWidth.toFloat(),
+                currentFrame.regionHeight.toFloat()
+        )
+        if (orientation == Orientation.LEFT) {
+            currentFrame.flip(true, false)
+        }
+        batch.draw(
+                currentFrame,
+                //position, bottom left corner
+                position.x - (size.x / 2),
+                position.y
+        )
+        if (currentFrame.isFlipX ) {
+            currentFrame.flip(true, false)
+        }
+        return currentFrame
+    }
+
+    private fun getAnimation(name : String) = animations.find { it.name == name } ?: throw Exception("No animation $name for Actor $this")
 }

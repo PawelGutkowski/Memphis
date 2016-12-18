@@ -6,6 +6,5 @@ data class AnimationAsset (
         val meta: String,
         val width: Float,
         val height: Float,
-        val frameDuration : Float,
-        val breakable : Boolean
+        val frameDuration : Float
 )
