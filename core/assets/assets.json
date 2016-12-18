@@ -1,0 +1,13 @@
+{
+  "animations": {
+    "template" : [
+      {
+        "name"   : "walk",
+        "source" : "template/walk.png",
+        "meta"   : "template/walk.json",
+        "width"  : 283,
+        "height" : 474
+      }
+    ]
+  }
+}
