@@ -5,32 +5,31 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import memphis.game.assets.AnimationAsset
 import memphis.game.assets.GameAssets
+import memphis.game.core.Actor
 import memphis.game.core.ActorFactory
-import memphis.game.input.InGameInputProcessor
 
 class MemphisGame() : ApplicationAdapter() {
     var spriteBatch : SpriteBatch? = null
-    var player: TemplateWarrior? = null
+    var player: Actor? = null
     var viewport: Viewport? = null
     var camera = OrthographicCamera()
     var font : BitmapFont? = null
 
+    var potion : Texture? = null
+
     companion object {
+        //TODO: Will be extracted to json file
         val GAME_ASSETS = GameAssets(mapOf(
-                "template" to listOf (
-                        AnimationAsset("walk", "template/walk.png", "template/walk.json", 333f, 476f, 0.02f),
-                        AnimationAsset("stand", "template/stand.png", "template/stand.png", 198f, 472f, 0.02f),
-                        AnimationAsset("hit", "template/hit.png", "template/hit.png", 294f, 473f, 0.02f)
+                "pixel" to listOf (
+                        AnimationAsset("run", 50f, 60f, 0.1f),
+                        AnimationAsset("idle", 50f, 60f, 10f)
                 )
         ))
     }
@@ -38,18 +37,19 @@ class MemphisGame() : ApplicationAdapter() {
     override fun create() {
         spriteBatch = SpriteBatch()
         val actorFactory = ActorFactory(GAME_ASSETS)
-        val templateWarrior = actorFactory.createTemplateWarrior()
-        Gdx.input.inputProcessor = InGameInputProcessor(templateWarrior)
+        val templateWarrior = actorFactory.createPixel()
+        Gdx.input.inputProcessor = templateWarrior
         player = templateWarrior
         camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         camera.update()
         viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
         font = BitmapFont()
         font?.color = Color.WHITE
+        potion = Texture(Gdx.files.internal("redpotion.png"))
     }
 
     override fun render() {
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
+        Gdx.gl.glClearColor(0.3f, 0.3f, 0.3f, 0.3f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         camera.update()
 
@@ -59,6 +59,7 @@ class MemphisGame() : ApplicationAdapter() {
         spriteBatch?.begin()
         /*font?.draw(spriteBatch, viewport?.unproject(Vector2(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())).toString(), 400f, 100f)*/
         player?.render(spriteBatch ?: throw IllegalStateException("SpriteBatch should already be initialized"))
+        spriteBatch?.draw(potion, 200f, 200f, 100f, 100f)
         spriteBatch?.end()
     }
 
@@ -70,6 +71,3 @@ class MemphisGame() : ApplicationAdapter() {
         viewport?.update(width, height)
     }
 }
-/*
-fun TextureRegion.isFirst() : Boolean = MathUtils.isEqual(this.u, 0f) && MathUtils.isEqual(this.v, 0f)
-*/
