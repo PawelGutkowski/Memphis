@@ -1,16 +1,17 @@
-package memphis.game.core
+package memphis.game.core.actor
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import memphis.game.PixelMan
-import memphis.game.TemplateWarrior
 import memphis.game.assets.GameAssets
 import memphis.game.assets.MissingAssetException
+import memphis.game.core.Environment
+import memphis.game.core.NamedAnimation
 
 
-class ActorFactory(gameAssets: GameAssets) {
+class ActorFactory(gameAssets: GameAssets, val environment: Environment) {
 
     val animations : MutableMap<String, List<NamedAnimation>> = mutableMapOf()
 
@@ -28,7 +29,19 @@ class ActorFactory(gameAssets: GameAssets) {
         }
     }
 
-    fun createPixel() : Actor {
-        return PixelMan(animations["pixel"] ?: throw MissingAssetException("Missing asset: animations from group template"))
+    fun createPixel() : PlayableActor {
+        return PixelMan(getAnimations("pixel"), environment)
+    }
+
+    fun createCrate() : Actor {
+        return object :  Actor(getAnimations("crate"), environment) {}
+    }
+
+    fun createEnemy() : Actor {
+        return object : Actor(getAnimations("enemy"), environment) {}
+    }
+
+    private fun getAnimations(name : String): List<NamedAnimation> {
+        return animations[name] ?: throw MissingAssetException("Missing asset: animations from group $name")
     }
 }
