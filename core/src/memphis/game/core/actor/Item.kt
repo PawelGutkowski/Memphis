@@ -1,8 +1,10 @@
 package memphis.game.core.actor
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import memphis.game.core.Environment
-import memphis.game.core.Box
 
 
 abstract class Item(val environment: Environment) {
@@ -27,30 +29,54 @@ abstract class Item(val environment: Environment) {
 
     val size: Vector2 = Vector2(0f, 0f)
 
-    open var baseSize : Float = 0f
+    open var baseY: Float = 0f
+
+    open var baseX: Float = 0f
 
     open val baseType : BaseType = BaseType.BEHIND
 
-    open fun base() : Box {
+    open fun base() : Rectangle {
         return if(baseType == BaseType.BEHIND){
-            Box(
-                    position.x-(size.x/2), position.y,
-                    position.x+(size.x/2), position.y + baseSize
+            Rectangle(
+                    position.x-(baseX/2), position.y, baseX, baseY
             )
         } else {
-            Box(
-                    position.x-(size.x/2), position.y - baseSize/2f,
-                    position.x+(size.x/2), position.y + baseSize/2f
+            Rectangle (
+                    position.x-(baseX/2), position.y - baseY /2f, baseX, baseY
             )
         }
     }
 
     open fun origin() = Vector2(position.x, position.y + (size.y /2))
 
-    open fun hitbox() = Box(
-            position.x-(size.x/2), position.y,
-            position.x+(size.x/2), position.y+size.y
+    open fun hitbox() = Rectangle (
+            position.x-(baseX/2), position.y, baseX, size.y
     )
+
+    open fun startRender() : Unit {}
+
+    open fun finishRender() : Unit {}
+
+    abstract fun render(spriteBatch: SpriteBatch)
+
+    protected open fun renderFrame(batch: SpriteBatch, currentFrame : TextureRegion) : TextureRegion {
+        size.set(
+                currentFrame.regionWidth.toFloat(),
+                currentFrame.regionHeight.toFloat()
+        )
+        baseX = size.x
+        baseY = size.y/2f
+
+        batch.draw(
+                currentFrame,
+                //position, bottom left corner
+                position.x - (size.x / 2),
+                position.y,
+                size.x,
+                size.y
+        )
+        return currentFrame
+    }
 
     fun translate(dx : Float, dY: Float) = environment.translate(this, dx, dY)
 }

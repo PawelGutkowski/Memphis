@@ -1,7 +1,6 @@
 package memphis.game
 
 import memphis.game.core.Environment
-import memphis.game.core.Box
 import memphis.game.core.NamedAnimation
 import memphis.game.core.actor.PlayableActor
 

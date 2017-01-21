@@ -26,7 +26,8 @@ abstract class OrientedActor(animations : List<NamedAnimation>, environment: Env
                 currentFrame.regionWidth.toFloat(),
                 currentFrame.regionHeight.toFloat()
         )
-        baseSize = size.x/3
+        baseY = size.x/3
+        baseX = size.x/1.4f
         //TODO: should be replaced with render method parameters
         if (orientation == Orientation.LEFT) {
             currentFrame.flip(true, false)

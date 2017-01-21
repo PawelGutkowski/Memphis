@@ -21,33 +21,11 @@ abstract class Actor(val animations : List<NamedAnimation>, environment: Environ
 
     var currentAnimation : NamedAnimation = animations[0]
 
-    fun render(batch: SpriteBatch){
+    override fun render(spriteBatch: SpriteBatch){
         action.time += Gdx.graphics.deltaTime
         startRender()
-        currentFrame = renderFrame(batch, currentAnimation.getKeyFrame(action.time, true))
+        currentFrame = renderFrame(spriteBatch, currentAnimation.getKeyFrame(action.time, true))
         finishRender()
-    }
-
-    open fun startRender() : Unit {}
-
-    open fun finishRender() : Unit {}
-
-    protected open fun renderFrame(batch: SpriteBatch, currentFrame : TextureRegion) : TextureRegion {
-        size.set(
-                currentFrame.regionWidth.toFloat(),
-                currentFrame.regionHeight.toFloat()
-        )
-        baseSize = size.y/2f
-
-        batch.draw(
-                currentFrame,
-                //position, bottom left corner
-                position.x - (size.x / 2),
-                position.y,
-                size.x,
-                size.y
-        )
-        return currentFrame
     }
 
     protected open fun updateAction(action: Action) {

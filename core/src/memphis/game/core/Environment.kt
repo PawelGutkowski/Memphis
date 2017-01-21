@@ -1,7 +1,10 @@
 package memphis.game.core
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import memphis.game.core.actor.Item
+import memphis.game.not
 
 
 class Environment {
@@ -15,11 +18,28 @@ class Environment {
     }
 
     fun translate(item: Item, dX: Float, dY: Float) {
-        val newPosition = Vector2(item.position.x + dX, item.position.y + dY)
-        var collision = false
-        items.forEach {
-            collision = collision || it != item && newPosition in it.hitbox()
+        val newBase = Rectangle(item.base().x +dX, item.base().y + dY, item.base().width, item.base().height)
+        val colliding = items.find { it != item && it.base().overlaps(newBase) }
+
+        if (colliding != null) {
+            translateTo(item, colliding, dX/2, dY/2)
+        } else {
+            item.position.add(dX, dY)
         }
-        if(!collision) item.position.set(newPosition)
+    }
+
+    private fun translateTo(translated: Item, colliding: Item, dX : Float, dY: Float){
+        if(not(dX + dY in -1f..1f)){
+            val newBase = Rectangle(translated.base().x +dX, translated.base().y + dY, translated.base().width, translated.base().height)
+            if(translated == colliding || not(colliding.base().overlaps(newBase))){
+                translated.position.add(dX, dY)
+            } else {
+                translateTo(translated, colliding, dX/2, dY/2)
+            }
+        }
+    }
+
+    fun render(spriteBatch: SpriteBatch){
+        items.sortedByDescending { it.position.y }.forEach { it.render(spriteBatch) }
     }
 }

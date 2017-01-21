@@ -9,12 +9,12 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import memphis.game.assets.AnimationAsset
 import memphis.game.assets.GameAssets
-import memphis.game.core.Box
 import memphis.game.core.Environment
 import memphis.game.core.GameCamera
 import memphis.game.core.Projectile
@@ -42,18 +42,20 @@ class MemphisGame() : ApplicationAdapter() {
     var time = 0f
 
     companion object {
+        val dmitriWidth = 26f
+        val dmitriHeight = 48f;
         //TODO: Will be extracted to json file
         val GAME_ASSETS = GameAssets(mapOf(
                 "crate" to listOf(
                         AnimationAsset("idle", 24f, 23f, 10f)
                 ),
                 "pixel" to listOf (
-                        AnimationAsset("run-side", 50f, 60f, 0.1f),
-                        AnimationAsset("idle-side", 50f, 60f, 10f),
-                        AnimationAsset("run-front", 50f, 60f, 0.1f),
-                        AnimationAsset("idle-front", 50f, 60f, 10f),
-                        AnimationAsset("run-back", 50f, 60f, 0.1f),
-                        AnimationAsset("idle-back", 50f, 60f, 10f)
+                        AnimationAsset("run-side", dmitriWidth, dmitriHeight, 0.1f),
+                        AnimationAsset("idle-side", dmitriWidth, dmitriHeight, 10f),
+                        AnimationAsset("run-front", dmitriWidth, dmitriHeight, 0.1f),
+                        AnimationAsset("idle-front", dmitriWidth, dmitriHeight, 10f),
+                        AnimationAsset("run-back", dmitriWidth, dmitriHeight, 0.1f),
+                        AnimationAsset("idle-back", dmitriWidth, dmitriHeight, 10f)
                 ),
                 "enemy" to listOf (
                         AnimationAsset("idle", 100f, 100f, 0.2f)
@@ -113,12 +115,17 @@ class MemphisGame() : ApplicationAdapter() {
         spriteBatch?.begin()
 //        spriteBatch?.draw(background, 0f, 0f, 1000f, 1000f)
 //        font?.draw(spriteBatch, viewport?.unproject(Vector2(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())).toString(), 400f, 100f)
-        potions.forEach { it.render(getBatch(), potion) }
-        enemies.forEach{ it.render(getBatch()) }
+/*        enemies.forEach{ it.render(getBatch()) }
         crates.forEach { it.render(getBatch()) }
-        player?.render(getBatch())
+        player?.render(getBatch())*/
+        environment?.render(getBatch())
         spriteBatch?.end()
 
+//        renderBoxes()
+    }
+
+    private fun renderBoxes() {
+        //TODO: Gets messed up when windows is resized, why?
         shapeRenderer?.begin()
         renderBox(shapeRenderer, player, viewport)
         crates.forEach { renderBox(shapeRenderer, it, viewport) }
@@ -133,9 +140,9 @@ class MemphisGame() : ApplicationAdapter() {
         }
     }
 
-    private fun renderBox(hitbox : Box, shapeRenderer: ShapeRenderer, viewport: Viewport): Pair<Vector2, Vector2> {
-        val leftLower = viewport.project(Vector2(hitbox.fromX, hitbox.fromY))
-        val rightUpper = viewport.project(Vector2(hitbox.toX, hitbox.toY))
+    private fun renderBox(hitbox : Rectangle, shapeRenderer: ShapeRenderer, viewport: Viewport): Pair<Vector2, Vector2> {
+        val leftLower = viewport.project(Vector2(hitbox.x, hitbox.y))
+        val rightUpper = viewport.project(Vector2(hitbox.x + hitbox.width, hitbox.y+hitbox.height))
         shapeRenderer.rect(leftLower.x, leftLower.y, rightUpper.x - leftLower.x, rightUpper.y - leftLower.y)
         return Pair(leftLower, rightUpper)
     }
@@ -148,6 +155,7 @@ class MemphisGame() : ApplicationAdapter() {
 
     override fun resize(width: Int, height: Int) {
         viewport?.update(width, height)
+        camera.update()
     }
 }
 
