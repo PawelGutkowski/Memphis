@@ -3,6 +3,7 @@ package memphis.game.core.actor
 
 import com.badlogic.gdx.Input
 import memphis.game.core.Environment
+import memphis.game.core.GameCamera
 import memphis.game.core.GameInputProcessor
 import memphis.game.core.NamedAnimation
 
@@ -63,6 +64,6 @@ open class PlayableActor(animations : List<NamedAnimation>, environment: Environ
         if(action.type != ActionType.RUN || this.orientation != orientation){
             updateAction(Action(ActionType.RUN, orientation))
         }
-        translate(this.orientation.x * 4f, this.orientation.y*4f)
+        translate(this.orientation.x * GameCamera.cameraSpeed, this.orientation.y*GameCamera.cameraSpeed)
     }
 }

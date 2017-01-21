@@ -2,7 +2,7 @@ package memphis.game.core
 
 import com.badlogic.gdx.math.Vector2
 
-data class Hitbox(
+data class Box(
         val fromX: Float,
         val fromY: Float,
         val toX: Float,

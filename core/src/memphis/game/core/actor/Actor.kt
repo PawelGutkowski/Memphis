@@ -37,6 +37,8 @@ abstract class Actor(val animations : List<NamedAnimation>, environment: Environ
                 currentFrame.regionWidth.toFloat(),
                 currentFrame.regionHeight.toFloat()
         )
+        baseSize = size.y/2f
+
         batch.draw(
                 currentFrame,
                 //position, bottom left corner

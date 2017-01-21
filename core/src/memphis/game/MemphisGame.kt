@@ -7,21 +7,25 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import memphis.game.assets.AnimationAsset
 import memphis.game.assets.GameAssets
+import memphis.game.core.Box
 import memphis.game.core.Environment
 import memphis.game.core.GameCamera
 import memphis.game.core.Projectile
 import memphis.game.core.actor.Actor
 import memphis.game.core.actor.ActorFactory
+import memphis.game.core.actor.Item
 import memphis.game.core.actor.PlayableActor
 
 class MemphisGame() : ApplicationAdapter() {
     var spriteBatch : SpriteBatch? = null
+    var shapeRenderer: ShapeRenderer? = null
 
     var player: PlayableActor? = null
     var viewport: Viewport? = null
@@ -77,6 +81,9 @@ class MemphisGame() : ApplicationAdapter() {
         potion = Texture(Gdx.files.internal("redpotion.png"))
         background = Texture(Gdx.files.internal("background.png"))
 
+        shapeRenderer = ShapeRenderer()
+        shapeRenderer?.setAutoShapeType(true)
+
         this.environment = env
         addCrates(actorFactory)
     }
@@ -111,6 +118,26 @@ class MemphisGame() : ApplicationAdapter() {
         crates.forEach { it.render(getBatch()) }
         player?.render(getBatch())
         spriteBatch?.end()
+
+        shapeRenderer?.begin()
+        renderBox(shapeRenderer, player, viewport)
+        crates.forEach { renderBox(shapeRenderer, it, viewport) }
+        shapeRenderer?.end()
+    }
+
+    private fun renderBox(shapeRenderer: ShapeRenderer?, item: Item?, viewport: Viewport?) {
+        if(shapeRenderer != null && item != null && viewport!= null){
+            renderBox(item.base(), shapeRenderer, viewport)
+            val (leftLower, rightUpper) = renderBox(item.hitbox(), shapeRenderer, viewport)
+            shapeRenderer.x(leftLower.x + ((rightUpper.x - leftLower.x)/2), leftLower.y, 4f)
+        }
+    }
+
+    private fun renderBox(hitbox : Box, shapeRenderer: ShapeRenderer, viewport: Viewport): Pair<Vector2, Vector2> {
+        val leftLower = viewport.project(Vector2(hitbox.fromX, hitbox.fromY))
+        val rightUpper = viewport.project(Vector2(hitbox.toX, hitbox.toY))
+        shapeRenderer.rect(leftLower.x, leftLower.y, rightUpper.x - leftLower.x, rightUpper.y - leftLower.y)
+        return Pair(leftLower, rightUpper)
     }
 
     private fun getBatch() = spriteBatch ?: throw IllegalStateException("SpriteBatch should already be initialized")

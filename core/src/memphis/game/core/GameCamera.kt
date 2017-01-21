@@ -10,8 +10,8 @@ import memphis.game.core.actor.OrientedActor
 class GameCamera() : OrthographicCamera() {
 
     companion object {
+        public val cameraSpeed = 4f
         private val thresholdFactor = 0.2f
-        private val cameraSpeed = 4f
         private val movements = listOf(
                 CameraMovement(
                         { target, orientation, x, y -> target.x < x * threshold(Orientation.LEFT, orientation) },
