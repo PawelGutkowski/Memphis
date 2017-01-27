@@ -6,6 +6,7 @@ import memphis.game.core.Environment
 import memphis.game.core.GameCamera
 import memphis.game.core.GameInputProcessor
 import memphis.game.core.NamedAnimation
+import memphis.game.core.event.ShotEvent
 
 
 open class PlayableActor(animations : List<NamedAnimation>, environment: Environment) : OrientedActor(animations, environment), GameInputProcessor {
@@ -28,7 +29,7 @@ open class PlayableActor(animations : List<NamedAnimation>, environment: Environ
 
     override fun keyTyped(character: Char): Boolean {
         when(character){
-            'q' -> environment.shoot(this.origin(), this.orientation)
+            'q' -> environment.shoot(ShotEvent(this.origin(), this.orientation, this))
         }
         return true
     }

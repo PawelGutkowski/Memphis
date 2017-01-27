@@ -17,7 +17,6 @@ import memphis.game.assets.AnimationAsset
 import memphis.game.assets.GameAssets
 import memphis.game.core.Environment
 import memphis.game.core.GameCamera
-import memphis.game.core.Projectile
 import memphis.game.core.actor.Actor
 import memphis.game.core.actor.ActorFactory
 import memphis.game.core.actor.Item
@@ -31,19 +30,15 @@ class MemphisGame() : ApplicationAdapter() {
     var viewport: Viewport? = null
     var camera = GameCamera()
     var font : BitmapFont? = null
-    var potion : Texture? = null
     var background : Texture? = null
     var actorFactory : ActorFactory? = null
     var environment : Environment? = null
 
-    val enemies : MutableList<Actor> = mutableListOf()
     val crates : MutableList<Actor> = mutableListOf()
-    val potions : MutableList<Projectile>  = mutableListOf()
-    var time = 0f
 
     companion object {
         val dmitriWidth = 26f
-        val dmitriHeight = 48f;
+        val dmitriHeight = 48f
         //TODO: Will be extracted to json file
         val GAME_ASSETS = GameAssets(mapOf(
                 "crate" to listOf(
@@ -59,16 +54,18 @@ class MemphisGame() : ApplicationAdapter() {
                 ),
                 "enemy" to listOf (
                         AnimationAsset("idle", 100f, 100f, 0.2f)
+                ),
+                "projectile" to listOf(
+                        AnimationAsset("idle", 18f, 15f, 0.1f),
+                        AnimationAsset("boom", 18f, 15f, 0.1f)
                 )
         ))
-
-        val ENEMY_DISTANCE = 300f
     }
     override fun create() {
         spriteBatch = SpriteBatch()
-        val env = Environment()
-        actorFactory = ActorFactory(GAME_ASSETS, env)
-        val templateWarrior = actorFactory?.createPixel() ?: throw Exception("Actor not created")
+        actorFactory = ActorFactory(GAME_ASSETS)
+        val env = Environment(actorFactory ?: throw Exception("Actor Factory not initialized"))
+        val templateWarrior = actorFactory?.createPixel(env) ?: throw Exception("Actor not created")
 
         Gdx.input.inputProcessor = templateWarrior
         player = templateWarrior
@@ -80,7 +77,6 @@ class MemphisGame() : ApplicationAdapter() {
         viewport = StretchViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
         font = BitmapFont()
         font?.color = Color.WHITE
-        potion = Texture(Gdx.files.internal("redpotion.png"))
         background = Texture(Gdx.files.internal("background.png"))
 
         shapeRenderer = ShapeRenderer()
@@ -93,7 +89,7 @@ class MemphisGame() : ApplicationAdapter() {
     private fun addCrates(crateFactory: ActorFactory?) {
         if (crateFactory != null) {
             for (i in 0..100) {
-                val crate = crateFactory.createCrate()
+                val crate = crateFactory.createCrate(environment ?: throw IllegalStateException("Environment not created"))
                 crates.add(crate)
             }
         }
@@ -113,11 +109,6 @@ class MemphisGame() : ApplicationAdapter() {
         spriteBatch?.projectionMatrix = camera.projection
 
         spriteBatch?.begin()
-//        spriteBatch?.draw(background, 0f, 0f, 1000f, 1000f)
-//        font?.draw(spriteBatch, viewport?.unproject(Vector2(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())).toString(), 400f, 100f)
-/*        enemies.forEach{ it.render(getBatch()) }
-        crates.forEach { it.render(getBatch()) }
-        player?.render(getBatch())*/
         environment?.render(getBatch())
         spriteBatch?.end()
 
@@ -128,7 +119,7 @@ class MemphisGame() : ApplicationAdapter() {
         //TODO: Gets messed up when windows is resized, why?
         shapeRenderer?.begin()
         renderBox(shapeRenderer, player, viewport)
-        crates.forEach { renderBox(shapeRenderer, it, viewport) }
+        environment?.items?.forEach { renderBox(shapeRenderer, it, viewport) }
         shapeRenderer?.end()
     }
 

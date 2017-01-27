@@ -4,14 +4,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.Disposable
 import memphis.game.core.Environment
 
 
-abstract class Item(val environment: Environment) {
-
-    constructor(environment: Environment, position : Vector2) : this(environment) {
-        this.position.set(position)
-    }
+abstract class Item(val environment: Environment) : Disposable {
 
     enum class Orientation(val x: Float, val y: Float) {
         LEFT(-1f, 0f),
@@ -32,6 +29,8 @@ abstract class Item(val environment: Environment) {
     open var baseY: Float = 0f
 
     open var baseX: Float = 0f
+
+    var disposed = false
 
     open val baseType : BaseType = BaseType.BEHIND
 
@@ -77,6 +76,12 @@ abstract class Item(val environment: Environment) {
         )
         return currentFrame
     }
+
+    override fun dispose() {
+        disposed = true
+    }
+
+    open fun canCollide(other: Item) : Boolean = other != this
 
     fun translate(dx : Float, dY: Float) = environment.translate(this, dx, dY)
 }

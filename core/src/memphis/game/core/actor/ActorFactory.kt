@@ -9,9 +9,10 @@ import memphis.game.assets.GameAssets
 import memphis.game.assets.MissingAssetException
 import memphis.game.core.Environment
 import memphis.game.core.NamedAnimation
+import memphis.game.core.event.ShotEvent
 
 
-class ActorFactory(gameAssets: GameAssets, val environment: Environment) {
+class ActorFactory(gameAssets: GameAssets) {
 
     val animations : MutableMap<String, List<NamedAnimation>> = mutableMapOf()
 
@@ -29,17 +30,19 @@ class ActorFactory(gameAssets: GameAssets, val environment: Environment) {
         }
     }
 
-    fun createPixel() : PlayableActor {
+    fun createPixel(environment: Environment) : PlayableActor {
         return PixelMan(getAnimations("pixel"), environment)
     }
 
-    fun createCrate() : Actor {
+    fun createCrate(environment: Environment) : Actor {
         return object :  Actor(getAnimations("crate"), environment) {}
     }
 
-    fun createEnemy() : Actor {
+    fun createEnemy(environment: Environment) : Actor {
         return object : Actor(getAnimations("enemy"), environment) {}
     }
+
+    fun createProjectile(environment: Environment, event: ShotEvent) = Projectile(getAnimations("projectile"), environment, event)
 
     private fun getAnimations(name : String): List<NamedAnimation> {
         return animations[name] ?: throw MissingAssetException("Missing asset: animations from group $name")
