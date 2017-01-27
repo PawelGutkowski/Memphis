@@ -9,7 +9,7 @@ import memphis.game.core.NamedAnimation
 abstract class OrientedActor(animations : List<NamedAnimation>, environment: Environment) : Actor(animations, environment) {
 
     companion object {
-        val animationMap = mapOf(
+        val animationOrientationMap = mapOf(
                 Item.Orientation.RIGHT to "side",
                 Item.Orientation.LEFT to "side",
                 Item.Orientation.DOWN to "front",
@@ -54,7 +54,8 @@ abstract class OrientedActor(animations : List<NamedAnimation>, environment: Env
     }
 
     override fun getAnimation(action : Action) : NamedAnimation {
-        return animations.find { it.name == action.type.name.toLowerCase()+"-"+ animationMap[this.orientation]}
+        return animations.find { it.name == action.type.name.toLowerCase() }
+                ?: animations.find { it.name == action.type.name.toLowerCase()+"-"+ animationOrientationMap[this.orientation]}
                 ?: throw Exception("No animation ${action.type.name} for Actor $this")
     }
 }

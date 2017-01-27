@@ -57,7 +57,7 @@ class MemphisGame() : ApplicationAdapter() {
                 ),
                 "projectile" to listOf(
                         AnimationAsset("idle", 18f, 15f, 0.1f),
-                        AnimationAsset("boom", 18f, 15f, 0.1f)
+                        AnimationAsset("explode", 18f, 15f, 0.03f)
                 )
         ))
     }
@@ -112,7 +112,7 @@ class MemphisGame() : ApplicationAdapter() {
         environment?.render(getBatch())
         spriteBatch?.end()
 
-//        renderBoxes()
+        renderBoxes()
     }
 
     private fun renderBoxes() {

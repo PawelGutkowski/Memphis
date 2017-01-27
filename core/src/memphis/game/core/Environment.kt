@@ -2,7 +2,6 @@ package memphis.game.core
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Rectangle
-import com.badlogic.gdx.math.Vector2
 import memphis.game.core.actor.ActorFactory
 import memphis.game.core.actor.Item
 import memphis.game.core.event.ShotEvent

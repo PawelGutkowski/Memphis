@@ -2,6 +2,7 @@
 package memphis.game.core.actor
 
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.math.MathUtils
 import memphis.game.core.Environment
 import memphis.game.core.GameCamera
 import memphis.game.core.GameInputProcessor
@@ -29,7 +30,7 @@ open class PlayableActor(animations : List<NamedAnimation>, environment: Environ
 
     override fun keyTyped(character: Char): Boolean {
         when(character){
-            'q' -> environment.shoot(ShotEvent(this.origin(), this.orientation, this))
+            'q' -> environment.shoot(ShotEvent(this.origin().cpy().add(MathUtils.random(-4f, 4f), MathUtils.random(-4f, 4f)), this.orientation, this))
         }
         return true
     }

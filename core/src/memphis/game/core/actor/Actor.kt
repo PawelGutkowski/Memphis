@@ -12,7 +12,7 @@ abstract class Actor(val animations : List<NamedAnimation>, environment: Environ
     data class Action(val type : ActionType, val orientation : Orientation? = null, var time : Float = 0f)
 
     enum class ActionType(){
-        IDLE, RUN
+        IDLE, RUN, EXPLODE
     }
 
     open var action : Action = Action(ActionType.IDLE)
