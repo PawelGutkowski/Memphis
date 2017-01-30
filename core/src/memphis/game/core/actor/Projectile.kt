@@ -4,12 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import memphis.game.core.Environment
+import memphis.game.core.GameCamera
 import memphis.game.core.NamedAnimation
 import memphis.game.core.event.ShotEvent
 import memphis.game.not
 
 
-class Projectile(animations: List<NamedAnimation>, environment: Environment, event: ShotEvent) : OrientedActor(animations, environment), Destructible {
+class Projectile(animations: List<NamedAnimation>, environment: Environment, event: ShotEvent) : UniOrientedActor(animations, environment), Destructible {
+
     override fun destroy() {
         updateAction(Action(ActionType.DISPOSE))
     }
@@ -28,7 +30,7 @@ class Projectile(animations: List<NamedAnimation>, environment: Environment, eve
     override fun startRender() {
         super.startRender()
         if(action.type == ActionType.IDLE){
-            translate(orientation.x * 10f, orientation.y * 10f)
+            translate()
         } else if(action.type == ActionType.DISPOSE) {
             explosionTime += Gdx.graphics.deltaTime
             if(currentAnimation.isAnimationFinished(explosionTime)){
@@ -49,4 +51,6 @@ class Projectile(animations: List<NamedAnimation>, environment: Environment, eve
     override fun hitbox() = Rectangle (
             position.x-(base.x/2), position.y + (size.y*0.2f), base.x, (size.y * 0.6f)
     )
+
+    override fun speed(): Float = GameCamera.cameraSpeed * 1.5f
 }

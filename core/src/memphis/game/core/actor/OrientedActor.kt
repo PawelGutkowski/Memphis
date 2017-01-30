@@ -65,5 +65,7 @@ abstract class OrientedActor(animations : List<NamedAnimation>, environment: Env
                 ?: throw Exception("No animation ${action.type.name} for Actor $this")
     }
 
-    open fun translate() = translate(this.orientation.x * GameCamera.cameraSpeed, this.orientation.y* GameCamera.cameraSpeed)
+    open fun translate() = translate(this.orientation.x * speed(), this.orientation.y* speed())
+
+    open protected fun speed() = GameCamera.cameraSpeed
 }

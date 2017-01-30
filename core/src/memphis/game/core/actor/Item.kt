@@ -94,7 +94,7 @@ abstract class Item(val environment: Environment) : Disposable {
     open fun canCollide(other: Item) : Boolean = other != this
 
     open fun collide(other: Item) {
-        if(this is Destructible){
+        if(this is Destructible && (this is Projectile || other is Projectile)){
             this.destroy()
         }
     }
