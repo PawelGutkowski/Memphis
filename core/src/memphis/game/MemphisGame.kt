@@ -2,6 +2,7 @@ package memphis.game
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
@@ -21,6 +22,9 @@ import memphis.game.core.actor.Actor
 import memphis.game.core.actor.ActorFactory
 import memphis.game.core.actor.Item
 import memphis.game.core.actor.PlayableActor
+import memphis.game.core.controller.KeyboardAndMouse
+import memphis.game.core.controller.Xbox360Pad
+
 
 class MemphisGame() : ApplicationAdapter() {
     var spriteBatch : SpriteBatch? = null
@@ -35,6 +39,7 @@ class MemphisGame() : ApplicationAdapter() {
     var environment : Environment? = null
 
     val crates : MutableList<Actor> = mutableListOf()
+    val enemies : MutableList<Actor> = mutableListOf()
 
     companion object {
         val dmitriWidth = 26f
@@ -53,7 +58,7 @@ class MemphisGame() : ApplicationAdapter() {
                         AnimationAsset("idle-back", dmitriWidth, dmitriHeight, 10f)
                 ),
                 "enemy" to listOf (
-                        AnimationAsset("idle", 100f, 100f, 0.2f)
+                        AnimationAsset("idle", 32f, 44f, 10f)
                 ),
                 "projectile" to listOf(
                         AnimationAsset("idle", 18f, 15f, 0.1f),
@@ -61,13 +66,18 @@ class MemphisGame() : ApplicationAdapter() {
                 )
         ))
     }
+
+    private val xboxListener = Xbox360Pad.Listener()
+
     override fun create() {
         spriteBatch = SpriteBatch()
         actorFactory = ActorFactory(GAME_ASSETS)
         val env = Environment(actorFactory ?: throw Exception("Actor Factory not initialized"))
         val templateWarrior = actorFactory?.createPixel(env) ?: throw Exception("Actor not created")
 
-        Gdx.input.inputProcessor = templateWarrior
+        val listener = KeyboardAndMouse.Listener(templateWarrior)
+        templateWarrior.controllerProcessor = listener
+        Gdx.input.inputProcessor = listener
         player = templateWarrior
         env.registerItem(templateWarrior)
 
@@ -83,17 +93,17 @@ class MemphisGame() : ApplicationAdapter() {
         shapeRenderer?.setAutoShapeType(true)
 
         this.environment = env
-        addCrates(actorFactory)
+        addActors(crates, {actorFactory?.createCrate(env) ?: throw IllegalStateException("Environment not created")})
+        addActors(enemies, {actorFactory?.createEnemy(env) ?: throw IllegalStateException("Environment not created")})
+
+        Controllers.addListener(xboxListener)
     }
 
-    private fun addCrates(crateFactory: ActorFactory?) {
-        if (crateFactory != null) {
-            for (i in 0..100) {
-                val crate = crateFactory.createCrate(environment ?: throw IllegalStateException("Environment not created"))
-                crates.add(crate)
-            }
+    private fun addActors(actors : MutableList<Actor>, actorCreator: ()->Actor) {
+        for (i in 0..100) {
+            actors.add(actorCreator.invoke())
         }
-        crates.forEach {
+        actors.forEach {
             it.position.set(MathUtils.random(0f, 1000f), MathUtils.random(0f, 1000f))
             environment?.registerItem(it)
         }
@@ -108,6 +118,7 @@ class MemphisGame() : ApplicationAdapter() {
         spriteBatch?.transformMatrix = camera.view
         spriteBatch?.projectionMatrix = camera.projection
 
+        xboxListener.poll()
         spriteBatch?.begin()
         environment?.render(getBatch())
         spriteBatch?.end()
@@ -125,17 +136,17 @@ class MemphisGame() : ApplicationAdapter() {
 
     private fun renderBox(shapeRenderer: ShapeRenderer?, item: Item?, viewport: Viewport?) {
         if(shapeRenderer != null && item != null && viewport!= null){
-            renderBox(item.base(), shapeRenderer, viewport)
-            val (leftLower, rightUpper) = renderBox(item.hitbox(), shapeRenderer, viewport)
-            shapeRenderer.x(leftLower.x + ((rightUpper.x - leftLower.x)/2), leftLower.y, 4f)
+            renderBox(item.hitbox(), shapeRenderer, viewport)
+            if(item.isBaseless()){
+                renderBox(item.base(), shapeRenderer, viewport)
+            }
         }
     }
 
-    private fun renderBox(hitbox : Rectangle, shapeRenderer: ShapeRenderer, viewport: Viewport): Pair<Vector2, Vector2> {
+    private fun renderBox(hitbox : Rectangle, shapeRenderer: ShapeRenderer, viewport: Viewport){
         val leftLower = viewport.project(Vector2(hitbox.x, hitbox.y))
         val rightUpper = viewport.project(Vector2(hitbox.x + hitbox.width, hitbox.y+hitbox.height))
         shapeRenderer.rect(leftLower.x, leftLower.y, rightUpper.x - leftLower.x, rightUpper.y - leftLower.y)
-        return Pair(leftLower, rightUpper)
     }
 
     private fun getBatch() = spriteBatch ?: throw IllegalStateException("SpriteBatch should already be initialized")

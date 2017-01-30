@@ -14,6 +14,8 @@ class Projectile(animations: List<NamedAnimation>, environment: Environment, eve
         this.orientation = event.orientation
     }
 
+    override val baseType: BaseType = BaseType.NONE
+
     var shooter : Actor = event.shooter
 
     var explosionTime = 0f

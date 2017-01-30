@@ -14,11 +14,21 @@ abstract class Item(val environment: Environment) : Disposable {
         LEFT(-1f, 0f),
         RIGHT(1f, 0f),
         UP(0f, 1f),
-        DOWN(0f, -1f)
+        DOWN(0f, -1f),
+        UP_LEFT(-0.5f, 0.5f),
+        UP_RIGHT(0.5f, 0.5f),
+        DOWN_LEFT(-0.5f, -0.5f),
+        DOWN_RIGHT(0.5f, -0.5f);
+
+        companion object {
+            fun of(x : Float, y: Float) : Orientation {
+                return Orientation.values().sortedBy { Math.abs(it.x - x) + Math.abs(it.y - y) }.first()
+            }
+        }
     }
 
     enum class BaseType {
-        CENTRIC, BEHIND
+        CENTRIC, BEHIND, NONE
     }
 
     //fields
@@ -35,16 +45,14 @@ abstract class Item(val environment: Environment) : Disposable {
     open val baseType : BaseType = BaseType.BEHIND
 
     open fun base() : Rectangle {
-        return if(baseType == BaseType.BEHIND){
-            Rectangle(
-                    position.x-(baseX/2), position.y, baseX, baseY
-            )
-        } else {
-            Rectangle (
-                    position.x-(baseX/2), position.y - baseY /2f, baseX, baseY
-            )
+        return when(baseType){
+            BaseType.BEHIND -> Rectangle(position.x-(baseX/2), position.y, baseX, baseY)
+            BaseType.CENTRIC -> Rectangle (position.x-(baseX/2), position.y - baseY /2f, baseX, baseY)
+            else -> Rectangle(0f, 0f, 0f, 0f)
         }
     }
+
+    fun isBaseless() = baseType == BaseType.NONE
 
     open fun origin() = Vector2(position.x, position.y + (size.y /2))
 

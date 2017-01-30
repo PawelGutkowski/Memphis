@@ -39,7 +39,7 @@ class ActorFactory(gameAssets: GameAssets) {
     }
 
     fun createEnemy(environment: Environment) : Actor {
-        return object : Actor(getAnimations("enemy"), environment) {}
+        return object : OrientedActor(getAnimations("enemy"), environment) {}
     }
 
     fun createProjectile(environment: Environment, event: ShotEvent) = Projectile(getAnimations("projectile"), environment, event)

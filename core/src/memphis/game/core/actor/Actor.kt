@@ -28,7 +28,7 @@ abstract class Actor(val animations : List<NamedAnimation>, environment: Environ
         finishRender()
     }
 
-    protected open fun updateAction(action: Action) {
+    open fun updateAction(action: Action) {
         this.action = action
         this.currentAnimation = getAnimation(this.action)
     }
