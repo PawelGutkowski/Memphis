@@ -1,13 +1,18 @@
 package memphis.game.core.actor
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.math.Vector2
 import memphis.game.core.Environment
 import memphis.game.core.NamedAnimation
 import memphis.game.core.event.ShotEvent
 import memphis.game.not
 
 
-class Projectile(animations: List<NamedAnimation>, environment: Environment, event: ShotEvent) : OrientedActor(animations, environment) {
+class Projectile(animations: List<NamedAnimation>, environment: Environment, event: ShotEvent) : OrientedActor(animations, environment), Destructible {
+    override fun destroy() {
+        updateAction(Action(ActionType.DISPOSE))
+    }
 
     init {
         this.position.set(event.origin)
@@ -23,11 +28,8 @@ class Projectile(animations: List<NamedAnimation>, environment: Environment, eve
     override fun startRender() {
         super.startRender()
         if(action.type == ActionType.IDLE){
-            val translated = translate(orientation.x * 10f, orientation.y * 10f)
-            if(not(translated)){
-                updateAction(Action(ActionType.EXPLODE))
-            }
-        } else {
+            translate(orientation.x * 10f, orientation.y * 10f)
+        } else if(action.type == ActionType.DISPOSE) {
             explosionTime += Gdx.graphics.deltaTime
             if(currentAnimation.isAnimationFinished(explosionTime)){
                 dispose()
@@ -38,4 +40,13 @@ class Projectile(animations: List<NamedAnimation>, environment: Environment, eve
     override fun canCollide(other: Item): Boolean {
         return super.canCollide(other) && other != shooter && other !is Projectile
     }
+
+    override fun updateBase(size: Vector2) {
+        base.x = size.x/6
+        base.y = size.y/3
+    }
+
+    override fun hitbox() = Rectangle (
+            position.x-(base.x/2), position.y + (size.y*0.2f), base.x, (size.y * 0.6f)
+    )
 }

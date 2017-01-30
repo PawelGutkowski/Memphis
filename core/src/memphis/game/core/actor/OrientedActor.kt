@@ -2,6 +2,7 @@ package memphis.game.core.actor
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Vector2
 import memphis.game.core.Environment
 import memphis.game.core.GameCamera
 import memphis.game.core.NamedAnimation
@@ -27,8 +28,7 @@ abstract class OrientedActor(animations : List<NamedAnimation>, environment: Env
                 currentFrame.regionWidth.toFloat(),
                 currentFrame.regionHeight.toFloat()
         )
-        baseY = size.x/3f
-        baseX = size.x/2f
+        updateBase(size)
         //TODO: should be replaced with render method parameters
         if (orientation == Orientation.LEFT) {
             currentFrame.flip(true, false)
@@ -45,6 +45,11 @@ abstract class OrientedActor(animations : List<NamedAnimation>, environment: Env
             currentFrame.flip(true, false)
         }
         return currentFrame
+    }
+
+    override fun updateBase(size: Vector2) {
+        base.y = size.x/3f
+        base.x = size.x/2f
     }
 
     override fun updateAction(action: Action) {

@@ -30,14 +30,18 @@ class Environment (val actorFactory: ActorFactory){
                 translate(item.base(), dX, dY)
         )
 
-        val colliding = items.find { item.canCollide(it) && collisionHandler.isColliding(it)}
+        val colliding = items.find { item.canCollide(it) && it.canCollide(item) && collisionHandler.isColliding(it)}
         if (colliding != null) {
             val (rectangle, rectangle2) = collisionHandler.getRectangles(item, colliding)
             val translation = translateTo(rectangle, rectangle2, dX, dY)
             if(translation != null){
                 item.position.add(translation)
                 return true
-            } else return false
+            } else {
+                item.collide(colliding)
+                colliding.collide(item)
+                return false
+            }
         } else {
             item.position.add(dX, dY)
             return true

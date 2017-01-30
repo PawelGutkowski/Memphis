@@ -36,9 +36,7 @@ abstract class Item(val environment: Environment) : Disposable {
 
     val size: Vector2 = Vector2(0f, 0f)
 
-    open var baseY: Float = 0f
-
-    open var baseX: Float = 0f
+    open var base: Vector2 = Vector2(0f, 0f)
 
     var disposed = false
 
@@ -46,8 +44,8 @@ abstract class Item(val environment: Environment) : Disposable {
 
     open fun base() : Rectangle {
         return when(baseType){
-            BaseType.BEHIND -> Rectangle(position.x-(baseX/2), position.y, baseX, baseY)
-            BaseType.CENTRIC -> Rectangle (position.x-(baseX/2), position.y - baseY /2f, baseX, baseY)
+            BaseType.BEHIND -> Rectangle(position.x-(base.x/2), position.y, base.x, base.y)
+            BaseType.CENTRIC -> Rectangle (position.x-(base.x/2), position.y - base.y /2f, base.x, base.y)
             else -> Rectangle(0f, 0f, 0f, 0f)
         }
     }
@@ -57,7 +55,7 @@ abstract class Item(val environment: Environment) : Disposable {
     open fun origin() = Vector2(position.x, position.y + (size.y /2))
 
     open fun hitbox() = Rectangle (
-            position.x-(baseX/2), position.y, baseX, size.y
+            position.x-(base.x/2), position.y, base.x, size.y
     )
 
     open fun startRender() : Unit {}
@@ -71,8 +69,7 @@ abstract class Item(val environment: Environment) : Disposable {
                 currentFrame.regionWidth.toFloat(),
                 currentFrame.regionHeight.toFloat()
         )
-        baseX = size.x
-        baseY = size.y/2f
+        updateBase(size)
 
         batch.draw(
                 currentFrame,
@@ -85,11 +82,22 @@ abstract class Item(val environment: Environment) : Disposable {
         return currentFrame
     }
 
+    protected open fun updateBase(size: Vector2) {
+        base.x = size.x
+        base.y = size.y / 2f
+    }
+
     override fun dispose() {
         disposed = true
     }
 
     open fun canCollide(other: Item) : Boolean = other != this
+
+    open fun collide(other: Item) {
+        if(this is Destructible){
+            this.destroy()
+        }
+    }
 
     fun translate(dx : Float, dY: Float) = environment.translate(this, dx, dY)
 }

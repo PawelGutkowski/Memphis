@@ -1,4 +1,4 @@
-package memphis.game
+package memphis.game.core.actor
 
 import memphis.game.core.Environment
 import memphis.game.core.NamedAnimation

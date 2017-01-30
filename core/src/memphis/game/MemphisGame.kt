@@ -62,7 +62,7 @@ class MemphisGame() : ApplicationAdapter() {
                 ),
                 "projectile" to listOf(
                         AnimationAsset("idle", 18f, 15f, 0.1f),
-                        AnimationAsset("explode", 18f, 15f, 0.03f)
+                        AnimationAsset("dispose", 18f, 15f, 0.03f)
                 )
         ))
     }

@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
-import memphis.game.PixelMan
+import memphis.game.core.actor.PixelMan
 import memphis.game.assets.GameAssets
 import memphis.game.assets.MissingAssetException
 import memphis.game.core.Environment
@@ -39,7 +39,7 @@ class ActorFactory(gameAssets: GameAssets) {
     }
 
     fun createEnemy(environment: Environment) : Actor {
-        return object : OrientedActor(getAnimations("enemy"), environment) {}
+        return BasicEnemy(getAnimations("enemy"), environment)
     }
 
     fun createProjectile(environment: Environment, event: ShotEvent) = Projectile(getAnimations("projectile"), environment, event)
