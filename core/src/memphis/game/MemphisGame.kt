@@ -137,7 +137,7 @@ class MemphisGame() : ApplicationAdapter() {
     private fun renderBox(shapeRenderer: ShapeRenderer?, item: Item?, viewport: Viewport?) {
         if(shapeRenderer != null && item != null && viewport!= null){
             renderBox(item.hitbox(), shapeRenderer, viewport)
-            if(item.isBaseless()){
+            if(item.hasBase()){
                 renderBox(item.base(), shapeRenderer, viewport)
             }
         }

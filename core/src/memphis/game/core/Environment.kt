@@ -25,7 +25,7 @@ class Environment (val actorFactory: ActorFactory){
     fun translate(item: Item, dX: Float, dY: Float): Boolean {
 
         val collisionHandler = CollisionHandler(
-                item.isBaseless(),
+                item.hasBase(),
                 translate(item.hitbox(), dX, dY),
                 translate(item.base(), dX, dY)
         )
@@ -41,33 +41,6 @@ class Environment (val actorFactory: ActorFactory){
         } else {
             item.position.add(dX, dY)
             return true
-        }
-    }
-
-    class CollisionHandler(isBaseless: Boolean, val newHitbox: Rectangle, val newBase : Rectangle) {
-
-        val isColliding : (Item)->Boolean = if(isBaseless){
-            { other -> other.hitbox().overlaps(newHitbox) }
-        } else {
-            { other ->
-                if(other.isBaseless()){
-                    other.hitbox().overlaps(newHitbox)
-                } else {
-                    other.base().overlaps(newBase)
-                }
-            }
-        }
-
-        val getRectangles : (Item, Item)->Pair<Rectangle, Rectangle> = if(isBaseless){
-            { item, other -> item.hitbox() to other.hitbox() }
-        } else {
-            { item, other ->
-                if(other.isBaseless()){
-                    item.hitbox() to other.hitbox()
-                } else {
-                    item.base() to other.base()
-                }
-            }
         }
     }
 

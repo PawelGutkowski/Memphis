@@ -52,7 +52,7 @@ abstract class Item(val environment: Environment) : Disposable {
         }
     }
 
-    fun isBaseless() = baseType == BaseType.NONE
+    fun hasBase() = baseType != BaseType.NONE
 
     open fun origin() = Vector2(position.x, position.y + (size.y /2))
 
