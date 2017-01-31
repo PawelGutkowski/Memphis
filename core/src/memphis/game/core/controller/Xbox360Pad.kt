@@ -3,7 +3,9 @@ package memphis.game.core.controller
 import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.ControllerAdapter
 import com.badlogic.gdx.controllers.PovDirection
+import memphis.game.core.actor.Actor
 import memphis.game.core.actor.Item
+import memphis.game.core.actor.PlayableActor
 
 class Xbox360Pad {
     companion object {
@@ -29,19 +31,25 @@ class Xbox360Pad {
         val AXIS_RIGHT_TRIGGER = 4 //value 0 to -1f
     }
 
-    class Listener : ControllerAdapter(), ControllerProcessor {
+    class Listener(val actor: PlayableActor) : ControllerAdapter(), ControllerProcessor {
 
-        val controllers : MutableList<Controller> = mutableListOf()
+        val controllers : MutableSet<Controller> = mutableSetOf()
 
         override fun poll() {
             controllers.forEach {
-                println(Item.Orientation.of(it.getAxis(AXIS_LEFT_X), -it.getAxis(AXIS_LEFT_Y)))
+                val orientation = Item.Orientation.of(it.getAxis(AXIS_LEFT_Y), -it.getAxis(AXIS_LEFT_X))
+                if(orientation != Item.Orientation.NONE){
+                    actor.handleMovement(orientation)
+                } else {
+                    if(actor.action.type == Actor.ActionType.RUN) actor.updateAction(Actor.Action(Actor.ActionType.IDLE))
+                }
             }
         }
 
         override fun buttonDown(controller: Controller?, buttonCode: Int): Boolean {
+            if(controller != null) controllers.add(controller)
             when(buttonCode){
-                BUTTON_A -> println("BUTTON A")
+                BUTTON_X -> actor.shoot()
             }
             return true
         }

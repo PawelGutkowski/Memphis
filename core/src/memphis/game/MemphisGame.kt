@@ -67,17 +67,11 @@ class MemphisGame() : ApplicationAdapter() {
         ))
     }
 
-    private val xboxListener = Xbox360Pad.Listener()
-
     override fun create() {
         spriteBatch = SpriteBatch()
         actorFactory = ActorFactory(GAME_ASSETS)
         val env = Environment(actorFactory ?: throw Exception("Actor Factory not initialized"))
         val templateWarrior = actorFactory?.createPixel(env) ?: throw Exception("Actor not created")
-
-        val listener = KeyboardAndMouse.Listener(templateWarrior)
-        templateWarrior.controllerProcessor = listener
-        Gdx.input.inputProcessor = listener
         player = templateWarrior
         env.registerItem(templateWarrior)
 
@@ -96,6 +90,8 @@ class MemphisGame() : ApplicationAdapter() {
         addActors(crates, {actorFactory?.createCrate(env) ?: throw IllegalStateException("Environment not created")})
         addActors(enemies, {actorFactory?.createEnemy(env) ?: throw IllegalStateException("Environment not created")})
 
+        val xboxListener = Xbox360Pad.Listener(templateWarrior)
+        templateWarrior.controllerProcessor = xboxListener
         Controllers.addListener(xboxListener)
     }
 
@@ -118,12 +114,11 @@ class MemphisGame() : ApplicationAdapter() {
         spriteBatch?.transformMatrix = camera.view
         spriteBatch?.projectionMatrix = camera.projection
 
-        xboxListener.poll()
         spriteBatch?.begin()
         environment?.render(getBatch())
         spriteBatch?.end()
 
-        renderBoxes()
+//        renderBoxes()
     }
 
     private fun renderBoxes() {

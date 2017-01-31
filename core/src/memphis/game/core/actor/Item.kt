@@ -18,7 +18,8 @@ abstract class Item(val environment: Environment) : Disposable {
         UP_LEFT(-0.5f, 0.5f),
         UP_RIGHT(0.5f, 0.5f),
         DOWN_LEFT(-0.5f, -0.5f),
-        DOWN_RIGHT(0.5f, -0.5f);
+        DOWN_RIGHT(0.5f, -0.5f),
+        NONE(0f, 0f);
 
         companion object {
             fun of(x : Float, y: Float) : Orientation {

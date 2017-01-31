@@ -15,7 +15,12 @@ abstract class OrientedActor(animations : List<NamedAnimation>, environment: Env
                 Item.Orientation.RIGHT to "side",
                 Item.Orientation.LEFT to "side",
                 Item.Orientation.DOWN to "front",
-                Item.Orientation.UP to "back"
+                Item.Orientation.UP to "back",
+
+                Item.Orientation.UP_LEFT to "back",
+                Item.Orientation.UP_RIGHT to "back",
+                Item.Orientation.DOWN_RIGHT to "front",
+                Item.Orientation.DOWN_LEFT to "front"
         )
     }
 
@@ -62,7 +67,7 @@ abstract class OrientedActor(animations : List<NamedAnimation>, environment: Env
     override fun getAnimation(action : Action) : NamedAnimation {
         return animations.find { it.name == action.type.name.toLowerCase() }
                 ?: animations.find { it.name == action.type.name.toLowerCase()+"-"+ animationOrientationMap[this.orientation]}
-                ?: throw Exception("No animation ${action.type.name} for Actor $this")
+                ?: throw Exception("No animation ${action.type.name}:${this.orientation} for Actor $this")
     }
 
     open fun translate() = translate(this.orientation.x * speed(), this.orientation.y* speed())
